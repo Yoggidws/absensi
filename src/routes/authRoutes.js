@@ -1,9 +1,33 @@
-const express = require("express");
-const { verifyToken, isAdmin } = require("../middleware/authMiddleware");
-const userController = require("../controllers/UserController");
+const express = require("express")
+const router = express.Router()
+const {
+  register,
+  login,
+  getProfile,
+  updateProfile,
+  forgotPassword,
+  resetPassword,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+} = require("../controllers/authController")
+const { protect, admin } = require("../middlewares/authMiddleware")
 
-const router = express.Router();
+// Public routes
+router.post("/register", register)
+router.post("/login", login)
+router.post("/forgot-password", forgotPassword)
+router.post("/reset-password/:resetToken", resetPassword)
 
-router.get("/", verifyToken, isAdmin, userController.getAllUsers); // Hanya admin bisa akses
+// Protected routes
+router.get("/profile", protect, getProfile)
+router.put("/profile", protect, updateProfile)
 
-module.exports = router;
+// Admin routes
+router.get("/users", protect, admin, getAllUsers)
+router.get("/users/:id", protect, admin, getUserById)
+router.put("/users/:id", protect, admin, updateUser)
+router.delete("/users/:id", protect, admin, deleteUser)
+
+module.exports = router
